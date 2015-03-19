@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>D3 Demo</title>
+  <link rel="stylesheet" href="/css/styles.css">
+
+</head>
+<body>
+<!-- graph append to element -->
+  <svg id="visualisation" width="1000" height="500"></svg>
+
+
+<!-- D3 scripts -->
+  <!-- <script type="text/javascript" src="/d3/d3.min.js"></script> -->
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
+  <script>
+  // transform data function
+    
+
+    var data = d3.csv("/data/Economic Prosperity Tables-3-clean.csv")
+        .row(function(d) {
+          var valuesArray = []; 
+          var year = 0;
+          var state = "Hawaii";
+          if (d.GeoName === state) {
+            var startYear = 1969;
+            var endYear = 2010;
+
+            for (var currYear = startYear; currYear <= endYear; currYear++) {
+              value = (d[currYear]);
+              year = currYear;
+              // valuesArray.push([value, year]);
+              // year = currYear;
+            }
+              console.log(d);
+
+            //plug in start and end year, and return array of values for 
+            // years in that range
+
+          }
+          return {}; 
+        })
+        .get(function(error, rows) {});
+  
+    function transformYearData (data) {
+      var yearKey = /^\d\d\d\d$/;
+      return _.map(data, function (item) {
+        return _.transform(item, function (result, n, key) {
+          if (yearKey.test(key)) {
+            var transformedVal = parseInt(n, 10);
+            result[key] = transformedVal ? transformedVal : -1;
+            console.log(transformedVal);
+          } else {
+            result[key] = n;
+          }
+        });
+      });
+    }
+
+    transformYearData(data);
+
+    var data = [{
+        "sale": "202",
+        "year": "2000"
+    }, {
+        "sale": "215",
+        "year": "2002"
+    }, {
+        "sale": "179",
+        "year": "2004"
+    }, {
+        "sale": "199",
+        "year": "2006"
+    }, {
+        "sale": "134",
+        "year": "2008"
+    }, {
+        "sale": "176",
+        "year": "2010"
+    }];
+
+    var data2 = [{
+        "sale": "152",
+        "year": "2000"
+    }, {
+        "sale": "189",
+        "year": "2002"
+    }, {
+        "sale": "179",
+        "year": "2004"
+    }, {
+        "sale": "199",
+        "year": "2006"
+    }, {
+        "sale": "134",
+        "year": "2008"
+    }, {
+        "sale": "176",
+        "year": "2010"
+    }];
+
+    // creates graph container
+    var vis = d3.select("#visualisation"),
+        WIDTH = 1000,
+        HEIGHT = 500,
+        MARGINS = {
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 50
+        },
+
+    // creates x and y axis
+    xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([2000,2010]), // x axis range
+    yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([134,215]),  // y axis range
+    xAxis = d3.svg.axis()  // creates generic axis function
+    .scale(xScale),   // assigns what scale to operate
+    yAxis = d3.svg.axis()
+    .scale(yScale)
+    .orient("left");
+    
+    // appends axis's to svg element
+    vis.append("svg:g")   // appends to vis element, creates g group element
+        .attr("class", "x axis")  // adds class="x axis"
+        .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+        .call(xAxis);  // xAxis is generated to g group, appends to vis element
+    vis.append("svg:g")
+        .attr("class", "y axis")
+        .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+        .call(yAxis);
+
+
+
+
+
+    // applies x and y Scale coordinates and plots line
+    var lineGen = d3.svg.line()
+      .x(function(d) {
+        return xScale(d.year);
+      })
+      .y(function(d) {
+        return yScale(d.sale);
+      });
+
+    // appends line to svg using lineGen function
+    vis.append('svg:path')
+      .attr('d', lineGen(data))
+      .attr('stroke', 'green')
+      .attr('stroke-width', 2)
+      .attr('fill', 'none');
+
+
+  </script>  
+</body>
+</html>
